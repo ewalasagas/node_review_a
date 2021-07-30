@@ -1,4 +1,5 @@
 const request = require('postman-request');
+const fs = require('fs');
 const geocode = require('./utils/geocode');
 const forecast = require('./utils/forecast');
 // const url = 'http://api.weatherstack.com/current?access_key=da797e6b933c92d093551cf7736b2be0&query=37.8267,-122.4233&units=f'
@@ -36,11 +37,31 @@ const forecast = require('./utils/forecast');
 //     }
 // });
 
-geocode('Boston', (error, data) => {
-    console.log('Error', error);
-    console.log('Data', data)
-})
+// const readline = require('readline').createInterface({
+//     input: process.stdin,
+//     output: process.stdout
+// })
 
+// readline.question('Enter City', data => {
+const address = process.argv[2];
+if(!address) {
+    console.log('Please enter an address')
+} else {
+    geocode(address, (error, {latitude, longitude, location} = {}) => {
+        if(error) {
+            return console.log(error);
+        }
+        // console.log('Data', data);
+        forecast(latitude, longitude, (error, forecastData) => {
+            if(error) {
+                return console.log(error);
+            }
+            console.log(location);
+            console.log(forecastData);
+        });
+    })
+}
+// })
 
 //
 // Goal: Create a reusable function for getting the forecast
@@ -51,8 +72,3 @@ geocode('Boston', (error, data) => {
 //    - Low level error, pass string for error
 //    - Coordinate error, pass string for error
 //    - Success, pass forecast string for data (same format as from before)
-
-forecast(-75.7088, 44.1545, (error, data) => {
-    console.log('Error', error)
-    console.log('Data - Test', data)
-  })
